@@ -3,7 +3,8 @@
 package fake
 
 import (
-	aquasecurityv1alpha1 "github.com/aquasecurity/starboard/pkg/apis/aquasecurity/v1alpha1"
+	aquasecurityv1alpha1 "../pkg/apis/aquasecurity/v1alpha1"
+	unisecurityv1alpha1 "../pkg/apis/unisecurity/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -16,6 +17,7 @@ var codecs = serializer.NewCodecFactory(scheme)
 
 var localSchemeBuilder = runtime.SchemeBuilder{
 	aquasecurityv1alpha1.AddToScheme,
+	unisecurityv1alpha1.AddToScheme,
 }
 
 // AddToScheme adds all types of this clientset into the given scheme. This allows composition

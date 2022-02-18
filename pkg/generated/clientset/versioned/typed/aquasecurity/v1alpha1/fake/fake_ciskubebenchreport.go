@@ -5,7 +5,7 @@ package fake
 import (
 	"context"
 
-	v1alpha1 "github.com/aquasecurity/starboard/pkg/apis/aquasecurity/v1alpha1"
+	v1alpha1 "../pkg/apis/aquasecurity/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -83,7 +83,7 @@ func (c *FakeCISKubeBenchReports) Update(ctx context.Context, cISKubeBenchReport
 // Delete takes name of the cISKubeBenchReport and deletes it. Returns an error if one occurs.
 func (c *FakeCISKubeBenchReports) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteAction(ciskubebenchreportsResource, name), &v1alpha1.CISKubeBenchReport{})
+		Invokes(testing.NewRootDeleteActionWithOptions(ciskubebenchreportsResource, name, opts), &v1alpha1.CISKubeBenchReport{})
 	return err
 }
 

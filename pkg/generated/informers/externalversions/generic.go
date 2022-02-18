@@ -5,7 +5,8 @@ package externalversions
 import (
 	"fmt"
 
-	v1alpha1 "github.com/aquasecurity/starboard/pkg/apis/aquasecurity/v1alpha1"
+	v1alpha1 "./../pkg/apis/aquasecurity/v1alpha1"
+	unisecurityv1alpha1 "./../pkg/apis/unisecurity/v1alpha1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -49,6 +50,10 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Aquasecurity().V1alpha1().KubeHunterReports().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("vulnerabilityreports"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Aquasecurity().V1alpha1().VulnerabilityReports().Informer()}, nil
+
+		// Group=unisecurity.unicloud.com, Version=v1alpha1
+	case unisecurityv1alpha1.SchemeGroupVersion.WithResource("containerservices"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Unisecurity().V1alpha1().ContainerServices().Informer()}, nil
 
 	}
 

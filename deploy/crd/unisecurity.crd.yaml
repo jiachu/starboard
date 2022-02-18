@@ -1,0 +1,64 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: containerservices.unisecurity.unicloud.com
+  labels:
+    app.kubernetes.io/managed-by: starboard
+    app.kubernetes.io/version: "0.14.1"
+spec:
+  group: unisecurity.unicloud.com
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          required:
+            - apiVersion
+            - kind
+            - metadata
+            - data
+          properties:
+            apiVersion:
+              type: string
+            kind:
+              type: string
+            metadata:
+              type: object
+            data:
+              description: |
+                container service data.
+              type: object
+              required:
+                - action
+                - kind
+                - resource_name
+              properties:
+                action:
+                  description: |
+                    container service action.
+                  type: string
+                  enum:
+                    - P_ImageScanner
+                    - P_ConfigAudit
+                    - P_CISBench
+                kind:
+                  description: |
+                    container service kind.
+                  type: string
+                resource_name:
+                  description: |
+                    container service resource_names.
+                  type: string
+  scope: Namespaced
+  names:
+    singular: containerservice
+    plural: containerservices
+    kind: ContainerService
+    listKind: ContainerServiceList
+    categories:
+      - all
+    shortNames:
+      - uni
+      - unis

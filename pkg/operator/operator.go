@@ -128,6 +128,19 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 	logsReader := kube.NewLogsReader(kubeClientset)
 	secretsReader := kube.NewSecretsReader(mgr.GetClient())
 
+	//start unicloud security config
+	uniControl := &controller.UnisecurityReconciler{
+		Logger:         ctrl.Log.WithName("reconciler").WithName("unisecurity"),
+		Config:         operatorConfig,
+		ConfigData:     starboardConfig,
+		Client:         mgr.GetClient(),
+		ObjectResolver: objectResolver,
+		LimitChecker:   limitChecker,
+	}
+	if err = uniControl.SetupWithManager(mgr); err != nil {
+		return fmt.Errorf("unable to setup unisecurity reconciler: %v", err)
+	}
+
 	if operatorConfig.VulnerabilityScannerEnabled {
 		plugin, pluginContext, err := plugin.NewResolver().
 			WithBuildInfo(buildInfo).
@@ -145,7 +158,7 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 			return fmt.Errorf("initializing %s plugin: %w", pluginContext.GetName(), err)
 		}
 
-		if err = (&controller.VulnerabilityReportReconciler{
+		vulControl := &controller.VulnerabilityReportReconciler{
 			Logger:         ctrl.Log.WithName("reconciler").WithName("vulnerabilityreport"),
 			Config:         operatorConfig,
 			ConfigData:     starboardConfig,
@@ -157,9 +170,13 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 			Plugin:         plugin,
 			PluginContext:  pluginContext,
 			ReadWriter:     vulnerabilityreport.NewReadWriter(mgr.GetClient()),
-		}).SetupWithManager(mgr); err != nil {
+		}
+		if err = vulControl.SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("unable to setup vulnerabilityreport reconciler: %w", err)
 		}
+
+		//registry for vulnerability scanner
+		uniControl.RegisterVulReconciler(vulControl)
 
 		if operatorConfig.VulnerabilityScannerReportTTL != nil {
 			if err = (&controller.TTLReportReconciler{
@@ -189,7 +206,7 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 			return fmt.Errorf("initializing %s plugin: %w", pluginContext.GetName(), err)
 		}
 
-		if err = (&controller.ConfigAuditReportReconciler{
+		confAuditControl := &controller.ConfigAuditReportReconciler{
 			Logger:         ctrl.Log.WithName("reconciler").WithName("configauditreport"),
 			Config:         operatorConfig,
 			ConfigData:     starboardConfig,
@@ -200,9 +217,13 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 			Plugin:         plugin,
 			PluginContext:  pluginContext,
 			ReadWriter:     configauditreport.NewReadWriter(mgr.GetClient()),
-		}).SetupWithManager(mgr); err != nil {
+		}
+		if err = confAuditControl.SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("unable to setup configauditreport reconciler: %w", err)
 		}
+
+		//register config audit
+		uniControl.RegisterConfAuditReconciler(confAuditControl)
 
 		if err = (&controller.PluginsConfigReconciler{
 			Logger:        ctrl.Log.WithName("reconciler").WithName("pluginsconfig"),
@@ -216,7 +237,7 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 	}
 
 	if operatorConfig.CISKubernetesBenchmarkEnabled {
-		if err = (&controller.CISKubeBenchReportReconciler{
+		cisBench := &controller.CISKubeBenchReportReconciler{
 			Logger:       ctrl.Log.WithName("reconciler").WithName("ciskubebenchreport"),
 			Config:       operatorConfig,
 			ConfigData:   starboardConfig,
@@ -225,9 +246,12 @@ func Start(ctx context.Context, buildInfo starboard.BuildInfo, operatorConfig et
 			LimitChecker: limitChecker,
 			ReadWriter:   kubebench.NewReadWriter(mgr.GetClient()),
 			Plugin:       kubebench.NewKubeBenchPlugin(ext.NewSystemClock(), starboardConfig),
-		}).SetupWithManager(mgr); err != nil {
+		}
+		if err = cisBench.SetupWithManager(mgr); err != nil {
 			return fmt.Errorf("unable to setup ciskubebenchreport reconciler: %w", err)
 		}
+		//registry cis bench
+		uniControl.RegisterCISBenchReconciler(cisBench)
 	}
 
 	setupLog.Info("Starting controllers manager")

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/aquasecurity/starboard/pkg/apis/unisecurity/v1alpha1"
 	"strings"
 
 	"github.com/aquasecurity/starboard/pkg/starboard"
@@ -60,6 +61,8 @@ const (
 	KindClusterRoleBindings      Kind   = "ClusterRoleBinding"
 	KindCustomResourceDefinition Kind   = "CustomResourceDefinition"
 	deploymentAnnotation         string = "deployment.kubernetes.io/revision"
+
+	KindUniContainerService Kind = "ContainerService"
 )
 
 // IsBuiltInWorkload returns true if the specified v1.OwnerReference
@@ -585,4 +588,14 @@ func (o *ObjectResolver) getActivePodsByLabelSelector(ctx context.Context, names
 		return pods, ErrNoRunningPods
 	}
 	return pods, nil
+}
+
+func (o *ObjectResolver) GetContainerSrvByObj(
+	ctx context.Context, workload ObjectRef) (*v1alpha1.ContainerService, error) {
+	obj := &v1alpha1.ContainerService{}
+	err := o.Client.Get(ctx, types.NamespacedName{Name: workload.Name, Namespace: workload.Namespace}, obj)
+	if err != nil {
+		return nil, err
+	}
+	return obj, nil
 }

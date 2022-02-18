@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/aquasecurity/starboard/pkg/apis/aquasecurity/v1alpha1"
+	univ1alpha1 "github.com/aquasecurity/starboard/pkg/apis/unisecurity/v1alpha1"
 	"github.com/google/go-containerregistry/pkg/name"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -32,6 +33,7 @@ func NewScheme() *runtime.Scheme {
 	_ = v1alpha1.AddToScheme(scheme)
 	_ = coordinationv1.AddToScheme(scheme)
 	_ = apiextensionsv1.AddToScheme(scheme)
+	_ = univ1alpha1.AddToScheme(scheme)
 	return scheme
 }
 

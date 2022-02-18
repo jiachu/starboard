@@ -1,0 +1,9 @@
+apiVersion: unisecurity.unicloud.com/v1alpha1
+kind: ContainerService
+metadata:
+  name: test-cs
+  namespace: default
+data:
+  action: P_ImageScanner
+  kind: deployments
+  resource_name: test

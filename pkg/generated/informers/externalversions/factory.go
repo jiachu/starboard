@@ -7,9 +7,10 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/aquasecurity/starboard/pkg/generated/clientset/versioned"
-	aquasecurity "github.com/aquasecurity/starboard/pkg/generated/informers/externalversions/aquasecurity"
-	internalinterfaces "github.com/aquasecurity/starboard/pkg/generated/informers/externalversions/internalinterfaces"
+	aquasecurity "../pkg/generated/informers/externalversions/aquasecurity"
+	internalinterfaces "../pkg/generated/informers/externalversions/internalinterfaces"
+	unisecurity "../pkg/generated/informers/externalversions/unisecurity"
+	versioned "./../pkg/generated/clientset/versioned"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
@@ -157,8 +158,13 @@ type SharedInformerFactory interface {
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
 	Aquasecurity() aquasecurity.Interface
+	Unisecurity() unisecurity.Interface
 }
 
 func (f *sharedInformerFactory) Aquasecurity() aquasecurity.Interface {
 	return aquasecurity.New(f, f.namespace, f.tweakListOptions)
+}
+
+func (f *sharedInformerFactory) Unisecurity() unisecurity.Interface {
+	return unisecurity.New(f, f.namespace, f.tweakListOptions)
 }

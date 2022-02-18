@@ -3,9 +3,11 @@
 package fake
 
 import (
-	clientset "github.com/aquasecurity/starboard/pkg/generated/clientset/versioned"
-	aquasecurityv1alpha1 "github.com/aquasecurity/starboard/pkg/generated/clientset/versioned/typed/aquasecurity/v1alpha1"
-	fakeaquasecurityv1alpha1 "github.com/aquasecurity/starboard/pkg/generated/clientset/versioned/typed/aquasecurity/v1alpha1/fake"
+	clientset "../pkg/generated/clientset/versioned"
+	aquasecurityv1alpha1 "../pkg/generated/clientset/versioned/typed/aquasecurity/v1alpha1"
+	fakeaquasecurityv1alpha1 "../pkg/generated/clientset/versioned/typed/aquasecurity/v1alpha1/fake"
+	unisecurityv1alpha1 "../pkg/generated/clientset/versioned/typed/unisecurity/v1alpha1"
+	fakeunisecurityv1alpha1 "../pkg/generated/clientset/versioned/typed/unisecurity/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
@@ -66,4 +68,9 @@ var (
 // AquasecurityV1alpha1 retrieves the AquasecurityV1alpha1Client
 func (c *Clientset) AquasecurityV1alpha1() aquasecurityv1alpha1.AquasecurityV1alpha1Interface {
 	return &fakeaquasecurityv1alpha1.FakeAquasecurityV1alpha1{Fake: &c.Fake}
+}
+
+// UnisecurityV1alpha1 retrieves the UnisecurityV1alpha1Client
+func (c *Clientset) UnisecurityV1alpha1() unisecurityv1alpha1.UnisecurityV1alpha1Interface {
+	return &fakeunisecurityv1alpha1.FakeUnisecurityV1alpha1{Fake: &c.Fake}
 }
